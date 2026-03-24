@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Simple Notes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>My Notes</h1>
+            <p>Simpan ide dan catatan pentingmu di sini.</p>
+        </header>
+
+        <section class="note-form">
+            <input type="text" id="noteTitle" placeholder="Judul Catatan..." required>
+            <textarea id="noteDesc" placeholder="Isi deskripsi..." rows="4" required></textarea>
+            <button id="saveBtn">Simpan Catatan</button>
+        </section>
+
+        <hr>
+
+        <div id="notesContainer" class="notes-grid">
+            </div>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h3>Edit Catatan</h3>
+            <input type="text" id="editTitle">
+            <textarea id="editDesc" rows="4"></textarea>
+            <div class="modal-buttons">
+                <button id="updateBtn">Update</button>
+                <button id="closeModal">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
