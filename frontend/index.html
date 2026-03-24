@@ -3,38 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Simple Notes</title>
+    <title>Focused Notes Manager</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
+    <div class="app-container">
         <header>
-            <h1>My Notes</h1>
-            <p>Simpan ide dan catatan pentingmu di sini.</p>
+            <h2>Notes</h2>
         </header>
 
-        <section class="note-form">
-            <input type="text" id="noteTitle" placeholder="Judul Catatan..." required>
-            <textarea id="noteDesc" placeholder="Isi deskripsi..." rows="4" required></textarea>
-            <button id="saveBtn">Simpan Catatan</button>
-        </section>
-
-        <hr>
-
-        <div id="notesContainer" class="notes-grid">
+        <main>
+            <div class="note-input-container">
+                <input type="text" id="noteTitle" placeholder="Title" required>
+                <textarea id="noteDesc" placeholder="Write your note..." rows="3" required></textarea>
+                <div class="input-actions">
+                    <button id="saveBtn"><i class="fas fa-plus"></i> Add Note</button>
+                </div>
             </div>
-    </div>
 
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <h3>Edit Catatan</h3>
-            <input type="text" id="editTitle">
-            <textarea id="editDesc" rows="4"></textarea>
-            <div class="modal-buttons">
-                <button id="updateBtn">Update</button>
-                <button id="closeModal">Batal</button>
+            <div class="archives-header">
+                <h3>Recent Archives</h3>
             </div>
-        </div>
+
+            <div id="notesContainer" class="notes-grid">
+                </div>
+        </main>
     </div>
 
     <script src="script.js"></script>

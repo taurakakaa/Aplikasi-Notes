@@ -5,77 +5,86 @@ const noteDesc = document.getElementById('noteDesc');
 const saveBtn = document.getElementById('saveBtn');
 const notesContainer = document.getElementById('notesContainer');
 
-// 2. Fungsi Mengambil Data (Read)
+// Helper untuk format tanggal agar terlihat rapi seperti di desain
+function formatDate(dateString) {
+    const options = { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+}
+
+// 1. Fungsi Mengambil Data (Read)
 async function getNotes() {
     try {
         const response = await fetch(API_URL);
         if (!response.ok) throw new Error("Gagal mengambil data dari server");
         
         const result = await response.json();
+        const notes = result.data || []; 
         
-        // Sequelize biasanya mengembalikan array langsung, 
-        // tapi pastikan formatnya sesuai dengan controller kamu
-        const notes = Array.isArray(result) ? result : result.data; 
-        
-        renderNotes(notes || []);
+        renderNotes(notes);
     } catch (error) {
         console.error("Error:", error);
-        notesContainer.innerHTML = <p style="color:red">Gagal memuat catatan. Pastikan Backend jalan!</p>;
+        notesContainer.innerHTML = '<p style="color:red">Gagal memuat catatan. Pastikan server backend jalan!</p>';
     }
 }
 
-// 3. Fungsi Menampilkan Catatan ke HTML
+// 2. Fungsi Menampilkan Catatan ke HTML
 function renderNotes(notes) {
     notesContainer.innerHTML = '';
     
     if (notes.length === 0) {
-        notesContainer.innerHTML = '<p>Belum ada catatan.</p>';
+        notesContainer.innerHTML = '<p style="color: #888;">Belum ada catatan. Tambahkan catatan pertamamu di atas!</p>';
         return;
     }
 
     notes.forEach(note => {
         const card = document.createElement('div');
         card.className = 'card';
+        // Note: Field disesuaikan dengan schema backend (judul & isi)
         card.innerHTML = `
             <div>
-                <h3>${note.title}</h3>
-                <p>${note.description}</p>
+                <span class="card-tag">NOTES</span>
+                <div class="card-content">
+                    <h4>${note.judul}</h4>
+                    <p>${note.isi}</p>
+                </div>
             </div>
-            <div class="card-actions">
-                <button class="edit-btn" onclick="editNote(${note.id}, '${note.title.replace(/'/g, "\\'")}', '${note.description.replace(/'/g, "\\'")}')">Edit</button>
-                <button class="delete-btn" onclick="deleteNote(${note.id})">Hapus</button>
+            <div class="card-footer">
+                <span><i class="far fa-clock"></i> ${formatDate(note.tanggal_dibuat)}</span>
+                <div class="card-actions">
+                    <i class="fas fa-pencil-alt edit-btn" onclick="editNote(${note.id}, '${note.judul.replace(/'/g, "\\'")}', '${note.isi.replace(/'/g, "\\'")}')" title="Edit"></i>
+                    <i class="fas fa-trash delete-btn" onclick="deleteNote(${note.id})" title="Hapus"></i>
+                </div>
             </div>
         `;
         notesContainer.appendChild(card);
     });
 }
 
-// 4. Fungsi Menambah Catatan (Create)
+// 3. Fungsi Menambah Catatan (Create)
 saveBtn.addEventListener('click', async () => {
-    const title = noteTitle.value.trim();
-    const description = noteDesc.value.trim();
+    const judul = noteTitle.value.trim();
+    const isi = noteDesc.value.trim();
 
-    if (!title || !description) {
-        alert("Judul dan Deskripsi tidak boleh kosong!");
+    if (!judul || !isi) {
+        alert("Judul dan deskripsi tidak boleh kosong!");
         return;
     }
 
-    const data = { title, description };
-
     try {
-        saveBtn.disabled = true; // Cegah double click
-        saveBtn.innerText = "Menyimpan...";
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
 
+        // Mengirim 'judul' dan 'isi' ke backend
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
+            body: JSON.stringify({ judul, isi })
         });
 
         if (response.ok) {
             noteTitle.value = '';
             noteDesc.value = '';
-            getNotes(); // Refresh list
+            getNotes(); // Refresh list otomatis setelah menambah
         } else {
             alert("Gagal menyimpan ke database");
         }
@@ -83,11 +92,11 @@ saveBtn.addEventListener('click', async () => {
         console.error("Error saat menambah:", error);
     } finally {
         saveBtn.disabled = false;
-        saveBtn.innerText = "Simpan Catatan";
+        saveBtn.innerHTML = '<i class="fas fa-plus"></i> Add Note';
     }
 });
 
-// 5. Fungsi Menghapus Catatan (Delete)
+// 4. Fungsi Menghapus Catatan (Delete)
 async function deleteNote(id) {
     if (!confirm("Hapus catatan ini?")) return;
 
@@ -106,14 +115,13 @@ async function deleteNote(id) {
     }
 }
 
-// 6. Fungsi Edit (Update)
-async function editNote(id, oldTitle, oldDesc) {
-    const newTitle = prompt("Edit Judul:", oldTitle);
-    const newDesc = prompt("Edit Deskripsi:", oldDesc);
+// 5. Fungsi Edit (Update)
+async function editNote(id, oldJudul, oldIsi) {
+    const newJudul = prompt("Edit Judul:", oldJudul);
+    const newIsi = prompt("Edit Isi Catatan:", oldIsi);
 
-    // Validasi jika user menekan 'Cancel' atau mengosongkan input
-    if (newTitle === null || newDesc === null) return;
-    if (newTitle.trim() === "" || newDesc.trim() === "") {
+    if (newJudul === null || newIsi === null) return;
+    if (newJudul.trim() === "" || newIsi.trim() === "") {
         alert("Input tidak boleh kosong!");
         return;
     }
@@ -122,7 +130,7 @@ async function editNote(id, oldTitle, oldDesc) {
         const response = await fetch(`${API_URL}/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title: newTitle, description: newDesc })
+            body: JSON.stringify({ judul: newJudul, isi: newIsi })
         });
 
         if (response.ok) {
@@ -135,5 +143,5 @@ async function editNote(id, oldTitle, oldDesc) {
     }
 }
 
-// Jalankan saat pertama kali buka
+// Jalankan saat halaman pertama kali dirender
 getNotes();
