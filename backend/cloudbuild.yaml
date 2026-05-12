@@ -2,13 +2,13 @@ steps:
   # Membuat image dengan perintah "cloud build -t gcr.io/$PROJECT_ID/notes-app-be ."
   # Project ID akan secara otomatis terisi ketika melakukan deploy di project yg dipilih
   - name: "gcr.io/cloud-builders/docker"
-    args: ["build", "-t", "gcr.io/$PROJECT_ID/notes_be", "."]
+    args: ["build", "-t", "gcr.io/$PROJECT_ID/notes-be", "."]
     dir: "backend"
 
   # Meng-upload/push image yg telah dibuat ke Artifact Registry
   # Pada bagian ini, dijalankan perintah "docker push 'gcr.io/$PROJECT_ID/notes-app-be'"
   - name: "gcr.io/cloud-builders/docker"
-    args: ["push", "gcr.io/$PROJECT_ID/notes_be"]
+    args: ["push", "gcr.io/$PROJECT_ID/notes-be"]
 
   # Melakukan deploy ke cloud run menggunakan image yg telah di-upload/push pada langkah sebelumnya
   # Pada bagian ini, dijalankan perintah sebagai berikut.
@@ -31,9 +31,9 @@ steps:
       [
         "run",
         "deploy",
-        "notes_be",
+        "notes-be",
         "--image",
-        "gcr.io/$PROJECT_ID/notes_be",
+        "gcr.io/$PROJECT_ID/notes-be",
         "--timeout",
         "1000s",
         "--port",
