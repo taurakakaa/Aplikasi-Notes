@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api/v1/notes'; 
+const API_URL = 'https://notes-be-764024000152.us-central1.run.app/api/v1/notes'; 
 
 const noteTitle = document.getElementById('noteTitle');
 const noteDesc = document.getElementById('noteDesc');
